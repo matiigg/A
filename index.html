@@ -28,10 +28,10 @@ a {text-decoration:none; color:#4a76a8; font-weight:bold;}
 #month-select {margin:10px 0; padding:5px 10px; font-size:1em;}
 .weekdays {display:grid; grid-template-columns:repeat(7,1fr); font-weight:bold; margin-bottom:5px;}
 #calendar-grid {display:grid; grid-template-columns:repeat(7,1fr); gap:5px; margin-top:10px;}
-.day {border:1px solid #ccc; background:#f9f9f9; padding:10px; min-height:70px; position:relative; border-radius:5px; cursor:pointer;}
+.day {border:1px solid #ccc; background:#f9f9f9; padding:5px; min-height:80px; position:relative; border-radius:5px;}
 .day.today {background:#ffcccc; font-weight:bold;}
-.day-label {font-weight:bold; margin-bottom:5px;}
-.event-popup {display:none; position:absolute; top:10px; left:50%; transform:translateX(-50%); background:white; border:1px solid #4a76a8; border-radius:5px; padding:5px 10px; z-index:1000; box-shadow:0 2px 5px rgba(0,0,0,0.2); width:150px; font-size:0.9em;}
+.day-label {font-weight:bold; margin-bottom:3px;}
+.event-popup {position:relative; display:block; margin-top:2px; border-radius:4px; padding:2px 4px; font-size:0.8em;}
 .event-sprawdzian {background:#ff4c4c; color:white;}
 .event-kartkowka {background:#ffcc00; color:black;}
 .event-inne {background:#4a76a8; color:white;}
@@ -77,49 +77,56 @@ a {text-decoration:none; color:#4a76a8; font-weight:bold;}
 
 <script>
 // Rozwijanie list przedmiotów
-const subjects = document.querySelectorAll('.subject');
-subjects.forEach(subject => {
-  const header = subject.querySelector('.subject-header');
-  const content = subject.querySelector('.subject-content');
-  header.addEventListener('click', () => {
-    const isExpanded = subject.classList.contains('expanded');
-    if(isExpanded){ content.style.maxHeight=null; subject.classList.remove('expanded'); }
-    else { content.style.maxHeight=content.scrollHeight+"px"; subject.classList.add('expanded'); }
-  });
+document.querySelectorAll('.subject').forEach(sub=>{
+  const h=sub.querySelector('.subject-header'); const c=sub.querySelector('.subject-content');
+  h.addEventListener('click', ()=>{if(sub.classList.contains('expanded')){c.style.maxHeight=null;sub.classList.remove('expanded');}else{c.style.maxHeight=c.scrollHeight+'px';sub.classList.add('expanded');}});
 });
 
-// TERMINARZ
-const openBtn = document.getElementById('open-calendar');
-const closeBtn = document.getElementById('close-calendar');
-const modal = document.getElementById('calendar-modal');
-openBtn.addEventListener('click', ()=> modal.style.display='block');
-closeBtn.addEventListener('click', ()=> modal.style.display='none');
+// Terminarz
+const openBtn=document.getElementById('open-calendar');
+const closeBtn=document.getElementById('close-calendar');
+const modal=document.getElementById('calendar-modal');
+openBtn.addEventListener('click',()=>modal.style.display='block');
+closeBtn.addEventListener('click',()=>modal.style.display='none');
 
 // Miesiące
-const monthSelect = document.getElementById('month-select');
-const months = ["Wrzesień 2025","Październik 2025","Listopad 2025","Grudzień 2025","Styczeń 2026","Luty 2026","Marzec 2026","Kwiecień 2026","Maj 2026","Czerwiec 2026"];
-months.forEach((m,i)=>{ const opt=document.createElement('option'); opt.value=i; opt.textContent=m; monthSelect.appendChild(opt); });
+const monthSelect=document.getElementById('month-select');
+const months=["Wrzesień 2025","Październik 2025","Listopad 2025","Grudzień 2025","Styczeń 2026","Luty 2026","Marzec 2026","Kwiecień 2026","Maj 2026","Czerwiec 2026"];
+months.forEach((m,i)=>{const opt=document.createElement('option');opt.value=i;opt.textContent=m;monthSelect.appendChild(opt);});
 
-// Wydarzenia (przykładowe, można podpiąć Google Sheets)
-let events = [
-  {date:"5.12.2025", subject:"Matematyka", type:"sprawdzian", desc:"Algebra"},
-  {date:"10.12.2025", subject:"Polski", type:"kartkówka", desc:"Środki stylistyczne"},
-  {date:"15.12.2025", subject:"Biologia", type:"inne", desc:"Prezentacja"},
-];
+// Wydarzenia z Google Sheets
+const sheetId = "TU_WKLEJ_SWOJE_ID_SHEET"; // wklej swoje ID arkusza
+const sheetUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+
+let events = [];
+
+fetch(sheetUrl)
+.then(res=>res.text())
+.then(data=>{
+  const json = JSON.parse(data.substr(47).slice(0,-2));
+  events = json.table.rows.map(r=>{
+    const date=r.c[0]?r.c[0].v:'';
+    const subject=r.c[1]?r.c[1].v:'';
+    const type=r.c[2]?r.c[2].v.toLowerCase():'inne';
+    const desc=r.c[3]?r.c[3].v:'';
+    return {date,subject,type,desc};
+  });
+  const now=new Date(); 
+  monthSelect.value = now.getMonth()-8>=0?now.getMonth()-8:0;
+  generateCalendar(parseInt(monthSelect.value));
+})
+.catch(err=>console.log(err));
 
 // Generowanie kalendarza
 function generateCalendar(monthIndex){
-  const container=document.getElementById('calendar-grid');
-  container.innerHTML='';
+  const container=document.getElementById('calendar-grid'); container.innerHTML='';
   const year=monthIndex<4?2025:2026;
   const month=monthIndex<4?monthIndex+8:monthIndex-4;
   const firstDay=new Date(year,month,1);
   const lastDay=new Date(year,month+1,0);
   const startOffset=(firstDay.getDay()+6)%7; // Pon=0, Nd=6
 
-  for(let i=0;i<startOffset;i++){
-    const empty=document.createElement('div'); empty.classList.add('day'); empty.style.background='transparent'; empty.style.border='none'; container.appendChild(empty);
-  }
+  for(let i=0;i<startOffset;i++){ const empty=document.createElement('div'); empty.classList.add('day'); empty.style.background='transparent'; empty.style.border='none'; container.appendChild(empty); }
 
   for(let d=1;d<=lastDay.getDate();d++){
     const dayDiv=document.createElement('div'); dayDiv.classList.add('day'); dayDiv.innerHTML=`<div class="day-label">${d}</div>`;
@@ -132,7 +139,6 @@ function generateCalendar(monthIndex){
         else if(ev.type.includes('kartkówka')) evtDiv.classList.add('event-kartkowka');
         else evtDiv.classList.add('event-inne');
         dayDiv.appendChild(evtDiv);
-        dayDiv.addEventListener('click', ()=> evtDiv.style.display=evtDiv.style.display==='block'?'none':'block');
       }
     });
     const today=new Date();
@@ -144,12 +150,7 @@ function generateCalendar(monthIndex){
   }
 }
 
-monthSelect.addEventListener('change', ()=> generateCalendar(parseInt(monthSelect.value)));
-window.addEventListener('load', ()=> { 
-  const now=new Date(); 
-  monthSelect.value=now.getMonth()-8>=0?now.getMonth()-8:0;
-  generateCalendar(parseInt(monthSelect.value)); 
-});
+monthSelect.addEventListener('change',()=>generateCalendar(parseInt(monthSelect.value)));
 </script>
 
 </body>
