@@ -5,197 +5,36 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>📚 Notatki szkolne + Terminarz</title>
 <style>
-  body {
-    font-family: 'Arial', sans-serif;
-    background: #f4f4f9;
-    margin: 0;
-    padding: 0;
-    color: #333;
-  }
+body {font-family:'Arial',sans-serif; background:#f4f4f9; margin:0; padding:0; color:#333;}
+header {background:#4a76a8; color:white; text-align:center; padding:20px 0; box-shadow:0 2px 5px rgba(0,0,0,0.2);}
+header h1 {margin:0;}
+section {max-width:800px; margin:20px auto; padding:0 20px;}
+.subject {background:#d3e0f0; margin:10px 0; border-left:5px solid #4a76a8; border-radius:5px; overflow:hidden; transition:0.3s; cursor:pointer;}
+.subject-header {padding:12px 15px; display:flex; justify-content:space-between; align-items:center; font-weight:bold; font-size:1.1em;}
+.subject-header:hover {background:#c0d7ed;}
+.arrow {transition:0.3s;}
+.subject-content {max-height:0; overflow:hidden; transition:max-height 0.3s ease; background:white;}
+.subject-content ul {list-style:none; padding-left:0; margin:0;}
+.subject-content li {padding:10px 15px; border-bottom:1px solid #eee; transition:0.2s;}
+.subject-content li:hover {background:#e0ebf5;}
+a {text-decoration:none; color:#4a76a8; font-weight:bold;}
+.expanded .arrow {transform:rotate(90deg);}
+@media (max-width:600px){.subject-header{font-size:1em;}}
 
-  header {
-    background: #4a76a8;
-    color: white;
-    text-align: center;
-    padding: 20px 0;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-  }
-
-  header h1 {
-    margin: 0;
-  }
-
-  section {
-    max-width: 900px;
-    margin: 20px auto;
-    padding: 0 20px;
-  }
-
-  .subject {
-    background: #d3e0f0;
-    margin: 10px 0;
-    border-left: 5px solid #4a76a8;
-    border-radius: 5px;
-    overflow: hidden;
-    transition: 0.3s;
-    cursor: pointer;
-  }
-
-  .subject-header {
-    padding: 12px 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-weight: bold;
-    font-size: 1.1em;
-  }
-
-  .subject-header:hover {
-    background: #c0d7ed;
-  }
-
-  .arrow {
-    transition: 0.3s;
-  }
-
-  .subject-content {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease;
-    background: white;
-  }
-
-  .subject-content ul {
-    list-style: none;
-    padding-left: 0;
-    margin: 0;
-  }
-
-  .subject-content li {
-    padding: 10px 15px;
-    border-bottom: 1px solid #eee;
-    transition: 0.2s;
-  }
-
-  .subject-content li:hover {
-    background: #e0ebf5;
-  }
-
-  a {
-    text-decoration: none;
-    color: #4a76a8;
-    font-weight: bold;
-  }
-
-  .expanded .arrow {
-    transform: rotate(90deg);
-  }
-
-  @media (max-width: 600px) {
-    .subject-header {
-      font-size: 1em;
-    }
-  }
-
-  /* TERMINARZ */
-  #open-calendar {
-    position: fixed;
-    top: 10px;
-    left: 10px;
-    z-index: 1000;
-    background: #4a76a8;
-    color:white;
-    border:none;
-    padding:10px 15px;
-    border-radius:5px;
-    cursor:pointer;
-  }
-
-  #calendar-modal {
-    display:none;
-    position:fixed;
-    top:50px;
-    left:50%;
-    transform:translateX(-50%);
-    width:95%;
-    max-width:1000px;
-    height:80%;
-    background:white;
-    border:2px solid #4a76a8;
-    border-radius:10px;
-    overflow:auto;
-    padding:20px;
-    box-shadow:0 4px 10px rgba(0,0,0,0.3);
-    z-index:1000;
-  }
-
-  #calendar-modal button#close-calendar {
-    float:right;
-    background:none;
-    border:none;
-    font-size:18px;
-    cursor:pointer;
-  }
-
-  #month-select {
-    margin: 10px 0;
-    padding:5px 10px;
-    font-size:1em;
-  }
-
-  #calendar-grid {
-    display:grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap:5px;
-    margin-top:10px;
-  }
-
-  .day {
-    border:1px solid #ccc;
-    background:#f9f9f9;
-    padding:10px;
-    min-height:70px;
-    position:relative;
-    border-radius:5px;
-    cursor:pointer;
-  }
-
-  .day.today {
-    background:#ffcccc;
-    font-weight:bold;
-  }
-
-  .day-label {
-    font-weight:bold;
-    margin-bottom:5px;
-  }
-
-  .weekdays {
-    display:grid;
-    grid-template-columns: repeat(6, 1fr);
-    font-weight:bold;
-    margin-bottom:5px;
-  }
-
-  .event-popup {
-    display:none;
-    position:absolute;
-    top:10px;
-    left:50%;
-    transform:translateX(-50%);
-    background:white;
-    border:1px solid #4a76a8;
-    border-radius:5px;
-    padding:5px 10px;
-    z-index:1000;
-    box-shadow:0 2px 5px rgba(0,0,0,0.2);
-    width:150px;
-    font-size:0.9em;
-  }
-
-  .event-sprawdzian {background:#ff4c4c; color:white;}
-  .event-kartkowka {background:#ffcc00; color:black;}
-  .event-inne {background:#4a76a8; color:white;}
+/* TERMINARZ */
+#open-calendar {position:fixed; top:10px; left:10px; z-index:1000; background:#4a76a8; color:white; border:none; padding:10px 15px; border-radius:5px; cursor:pointer;}
+#calendar-modal {display:none; position:fixed; top:50px; left:50%; transform:translateX(-50%); width:95%; max-width:1000px; height:80%; background:white; border:2px solid #4a76a8; border-radius:10px; overflow:auto; padding:20px; box-shadow:0 4px 10px rgba(0,0,0,0.3); z-index:1000;}
+#calendar-modal button#close-calendar {float:right; background:none; border:none; font-size:18px; cursor:pointer;}
+#month-select {margin:10px 0; padding:5px 10px; font-size:1em;}
+.weekdays {display:grid; grid-template-columns:repeat(7,1fr); font-weight:bold; margin-bottom:5px;}
+#calendar-grid {display:grid; grid-template-columns:repeat(7,1fr); gap:5px; margin-top:10px;}
+.day {border:1px solid #ccc; background:#f9f9f9; padding:10px; min-height:70px; position:relative; border-radius:5px; cursor:pointer;}
+.day.today {background:#ffcccc; font-weight:bold;}
+.day-label {font-weight:bold; margin-bottom:5px;}
+.event-popup {display:none; position:absolute; top:10px; left:50%; transform:translateX(-50%); background:white; border:1px solid #4a76a8; border-radius:5px; padding:5px 10px; z-index:1000; box-shadow:0 2px 5px rgba(0,0,0,0.2); width:150px; font-size:0.9em;}
+.event-sprawdzian {background:#ff4c4c; color:white;}
+.event-kartkowka {background:#ffcc00; color:black;}
+.event-inne {background:#4a76a8; color:white;}
 </style>
 </head>
 <body>
@@ -212,312 +51,105 @@
   <h2>📅 Terminarz</h2>
   <select id="month-select"></select>
   <div class="weekdays">
-    <div>Pon</div>
-    <div>Wt</div>
-    <div>Śr</div>
-    <div>Czw</div>
-    <div>Pt</div>
-    <div>Sob</div>
+    <div>Pon</div><div>Wt</div><div>Śr</div><div>Czw</div><div>Pt</div><div>Sob</div><div>Nd</div>
   </div>
   <div id="calendar-grid"></div>
 </div>
 
 <section>
-  <!-- Dodaj tutaj wszystkie przedmioty w rozwijanej liście -->
-  <!-- Biologia -->
-  <div class="subject">
-    <div class="subject-header">
-      Biologia <span class="arrow">▶</span>
-    </div>
-    <div class="subject-content">
-      <ul>
-        <li><a href="biologia/Aminokwasy.pdf" target="_blank">Aminokwasy</a></li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- Geografia -->
-  <div class="subject">
-    <div class="subject-header">
-      Geografia <span class="arrow">▶</span>
-    </div>
-    <div class="subject-content">
-      <ul>
-        <li><a href="geografia/placeholder.txt" target="_blank">placeholder.txt</a></li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- Matematyka -->
-  <div class="subject">
-    <div class="subject-header">
-      Matematyka <span class="arrow">▶</span>
-    </div>
-    <div class="subject-content">
-      <ul>
-        <li><a href="matematyka/placeholder.txt" target="_blank">placeholder.txt</a></li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- Polski -->
-  <div class="subject">
-    <div class="subject-header">
-      Polski <span class="arrow">▶</span>
-    </div>
-    <div class="subject-content">
-      <ul>
-        <li><a href="polski/placeholder.txt" target="_blank">placeholder.txt</a></li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- Historia -->
-  <div class="subject">
-    <div class="subject-header">
-      Historia <span class="arrow">▶</span>
-    </div>
-    <div class="subject-content">
-      <ul>
-        <li><a href="historia/placeholder.txt" target="_blank">placeholder.txt</a></li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- Biznes i zarządzanie -->
-  <div class="subject">
-    <div class="subject-header">
-      Biznes i zarządzanie <span class="arrow">▶</span>
-    </div>
-    <div class="subject-content">
-      <ul>
-        <li><a href="biznes_i_zarzadzanie/placeholder.txt" target="_blank">placeholder.txt</a></li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- Chemia -->
-  <div class="subject">
-    <div class="subject-header">
-      Chemia <span class="arrow">▶</span>
-    </div>
-    <div class="subject-content">
-      <ul>
-        <li><a href="chemia/placeholder.txt" target="_blank">placeholder.txt</a></li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- EDB -->
-  <div class="subject">
-    <div class="subject-header">
-      EDB <span class="arrow">▶</span>
-    </div>
-    <div class="subject-content">
-      <ul>
-        <li><a href="edb/placeholder.txt" target="_blank">placeholder.txt</a></li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- Fizyka -->
-  <div class="subject">
-    <div class="subject-header">
-      Fizyka <span class="arrow">▶</span>
-    </div>
-    <div class="subject-content">
-      <ul>
-        <li><a href="fizyka/placeholder.txt" target="_blank">placeholder.txt</a></li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- Informatyka -->
-  <div class="subject">
-    <div class="subject-header">
-      Informatyka <span class="arrow">▶</span>
-    </div>
-    <div class="subject-content">
-      <ul>
-        <li><a href="informatyka/placeholder.txt" target="_blank">placeholder.txt</a></li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- Język angielski -->
-  <div class="subject">
-    <div class="subject-header">
-      Język angielski <span class="arrow">▶</span>
-    </div>
-    <div class="subject-content">
-      <ul>
-        <li><a href="angielski/placeholder.txt" target="_blank">placeholder.txt</a></li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- Język hiszpański -->
-  <div class="subject">
-    <div class="subject-header">
-      Język hiszpański <span class="arrow">▶</span>
-    </div>
-    <div class="subject-content">
-      <ul>
-        <li><a href="hiszpanski/placeholder.txt" target="_blank">placeholder.txt</a></li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- Muzyka -->
-  <div class="subject">
-    <div class="subject-header">
-      Muzyka <span class="arrow">▶</span>
-    </div>
-    <div class="subject-content">
-      <ul>
-        <li><a href="muzyka/placeholder.txt" target="_blank">placeholder.txt</a></li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- INNE -->
-  <div class="subject">
-    <div class="subject-header">
-      INNE <span class="arrow">▶</span>
-    </div>
-    <div class="subject-content">
-      <ul>
-        <li><a href="inne/placeholder.txt" target="_blank">placeholder.txt</a></li>
-      </ul>
-    </div>
-  </div>
+<!-- Przedmioty i pliki -->
+<div class="subject"><div class="subject-header">Biologia <span class="arrow">▶</span></div><div class="subject-content"><ul><li><a href="biologia/Aminokwasy.pdf" target="_blank">Aminokwasy</a></li></ul></div></div>
+<div class="subject"><div class="subject-header">Geografia <span class="arrow">▶</span></div><div class="subject-content"><ul><li><a href="geografia/placeholder.txt" target="_blank">placeholder.txt</a></li></ul></div></div>
+<div class="subject"><div class="subject-header">Matematyka <span class="arrow">▶</span></div><div class="subject-content"><ul><li><a href="matematyka/placeholder.txt" target="_blank">placeholder.txt</a></li></ul></div></div>
+<div class="subject"><div class="subject-header">Polski <span class="arrow">▶</span></div><div class="subject-content"><ul><li><a href="polski/placeholder.txt" target="_blank">placeholder.txt</a></li></ul></div></div>
+<div class="subject"><div class="subject-header">Historia <span class="arrow">▶</span></div><div class="subject-content"><ul><li><a href="historia/placeholder.txt" target="_blank">placeholder.txt</a></li></ul></div></div>
+<div class="subject"><div class="subject-header">Biznes i zarządzanie <span class="arrow">▶</span></div><div class="subject-content"><ul><li><a href="biznes_i_zarzadzanie/placeholder.txt" target="_blank">placeholder.txt</a></li></ul></div></div>
+<div class="subject"><div class="subject-header">Chemia <span class="arrow">▶</span></div><div class="subject-content"><ul><li><a href="chemia/placeholder.txt" target="_blank">placeholder.txt</a></li></ul></div></div>
+<div class="subject"><div class="subject-header">EDB <span class="arrow">▶</span></div><div class="subject-content"><ul><li><a href="edb/placeholder.txt" target="_blank">placeholder.txt</a></li></ul></div></div>
+<div class="subject"><div class="subject-header">Fizyka <span class="arrow">▶</span></div><div class="subject-content"><ul><li><a href="fizyka/placeholder.txt" target="_blank">placeholder.txt</a></li></ul></div></div>
+<div class="subject"><div class="subject-header">Informatyka <span class="arrow">▶</span></div><div class="subject-content"><ul><li><a href="informatyka/placeholder.txt" target="_blank">placeholder.txt</a></li></ul></div></div>
+<div class="subject"><div class="subject-header">Język angielski <span class="arrow">▶</span></div><div class="subject-content"><ul><li><a href="angielski/placeholder.txt" target="_blank">placeholder.txt</a></li></ul></div></div>
+<div class="subject"><div class="subject-header">Język hiszpański <span class="arrow">▶</span></div><div class="subject-content"><ul><li><a href="hiszpanski/placeholder.txt" target="_blank">placeholder.txt</a></li></ul></div></div>
+<div class="subject"><div class="subject-header">Muzyka <span class="arrow">▶</span></div><div class="subject-content"><ul><li><a href="muzyka/placeholder.txt" target="_blank">placeholder.txt</a></li></ul></div></div>
+<div class="subject"><div class="subject-header">INNE <span class="arrow">▶</span></div><div class="subject-content"><ul><li><a href="inne/placeholder.txt" target="_blank">placeholder.txt</a></li></ul></div></div>
 
 </section>
 
 <script>
-  // Rozwijanie list przedmiotów
-  const subjects = document.querySelectorAll('.subject');
-  subjects.forEach(subject => {
-    const header = subject.querySelector('.subject-header');
-    const content = subject.querySelector('.subject-content');
-    header.addEventListener('click', () => {
-      const isExpanded = subject.classList.contains('expanded');
-      if (isExpanded) {
-        content.style.maxHeight = null;
-        subject.classList.remove('expanded');
-      } else {
-        content.style.maxHeight = content.scrollHeight + "px";
-        subject.classList.add('expanded');
-      }
-    });
+// Rozwijanie list przedmiotów
+const subjects = document.querySelectorAll('.subject');
+subjects.forEach(subject => {
+  const header = subject.querySelector('.subject-header');
+  const content = subject.querySelector('.subject-content');
+  header.addEventListener('click', () => {
+    const isExpanded = subject.classList.contains('expanded');
+    if(isExpanded){ content.style.maxHeight=null; subject.classList.remove('expanded'); }
+    else { content.style.maxHeight=content.scrollHeight+"px"; subject.classList.add('expanded'); }
   });
+});
 
-  // TERMINARZ - otwieranie/zamykanie
-  const openBtn = document.getElementById('open-calendar');
-  const closeBtn = document.getElementById('close-calendar');
-  const modal = document.getElementById('calendar-modal');
-  openBtn.addEventListener('click', ()=> modal.style.display='block');
-  closeBtn.addEventListener('click', ()=> modal.style.display='none');
+// TERMINARZ
+const openBtn = document.getElementById('open-calendar');
+const closeBtn = document.getElementById('close-calendar');
+const modal = document.getElementById('calendar-modal');
+openBtn.addEventListener('click', ()=> modal.style.display='block');
+closeBtn.addEventListener('click', ()=> modal.style.display='none');
 
-  // Wybór miesiąca
-  const monthSelect = document.getElementById('month-select');
-  const months = [
-    "Wrzesień 2025","Październik 2025","Listopad 2025","Grudzień 2025",
-    "Styczeń 2026","Luty 2026","Marzec 2026","Kwiecień 2026",
-    "Maj 2026","Czerwiec 2026"
-  ];
-  months.forEach((m,i)=> {
-    const opt = document.createElement('option');
-    opt.value=i;
-    opt.textContent=m;
-    monthSelect.appendChild(opt);
-  });
+// Miesiące
+const monthSelect = document.getElementById('month-select');
+const months = ["Wrzesień 2025","Październik 2025","Listopad 2025","Grudzień 2025","Styczeń 2026","Luty 2026","Marzec 2026","Kwiecień 2026","Maj 2026","Czerwiec 2026"];
+months.forEach((m,i)=>{ const opt=document.createElement('option'); opt.value=i; opt.textContent=m; monthSelect.appendChild(opt); });
 
-  let currentDate = new Date();
-  monthSelect.value = currentDate.getMonth()-8 >=0 ? currentDate.getMonth()-8 : 0; // ustawia aktualny miesiąc (wrzesień=0)
+// Wydarzenia (przykładowe, można podpiąć Google Sheets)
+let events = [
+  {date:"5.12.2025", subject:"Matematyka", type:"sprawdzian", desc:"Algebra"},
+  {date:"10.12.2025", subject:"Polski", type:"kartkówka", desc:"Środki stylistyczne"},
+  {date:"15.12.2025", subject:"Biologia", type:"inne", desc:"Prezentacja"},
+];
 
-  // Pobieranie wydarzeń z Google Sheets
-  const sheetId = "1G57zZRVzq0zuu4wTAXht6DzttC7bgVdJSdd4sdxGx-Q";
-  const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+// Generowanie kalendarza
+function generateCalendar(monthIndex){
+  const container=document.getElementById('calendar-grid');
+  container.innerHTML='';
+  const year=monthIndex<4?2025:2026;
+  const month=monthIndex<4?monthIndex+8:monthIndex-4;
+  const firstDay=new Date(year,month,1);
+  const lastDay=new Date(year,month+1,0);
+  const startOffset=(firstDay.getDay()+6)%7; // Pon=0, Nd=6
 
-  let events = [];
-
-  fetch(url)
-    .then(res => res.text())
-    .then(data => {
-      const jsonData = JSON.parse(data.substr(47).slice(0, -2));
-      events = jsonData.table.rows.map(row=>{
-        const date = row.c[0]?row.c[0].v:'';
-        const subject = row.c[1]?row.c[1].v:'';
-        const type = row.c[2]?row.c[2].v.toLowerCase():'inne';
-        const desc = row.c[3]?row.c[3].v:'';
-        return {date, subject, type, desc};
-      });
-      generateCalendar(parseInt(monthSelect.value));
-    })
-    .catch(err=>console.log(err));
-
-  monthSelect.addEventListener('change', ()=>{
-    generateCalendar(parseInt(monthSelect.value));
-  });
-
-  function generateCalendar(monthIndex){
-    const container = document.getElementById('calendar-grid');
-    container.innerHTML = '';
-    const year = monthIndex+8>=12 ? 2026 : 2025; // prosty mapping do roku
-    const month = monthIndex+8>=12 ? monthIndex-4 : monthIndex+8; // mapping miesiąca w Date
-    const firstDay = new Date(year, month,1);
-    const lastDay = new Date(year, month+1,0);
-
-    // ile pustych dni przed 1. dniem miesiąca (poniedziałek=0)
-    let startOffset = firstDay.getDay()-1;
-    if(startOffset<0) startOffset=5; // sobota poprzedniego miesiąca
-    for(let i=0;i<startOffset;i++){
-      const empty = document.createElement('div');
-      empty.classList.add('day');
-      empty.style.background='transparent';
-      empty.style.border='none';
-      container.appendChild(empty);
-    }
-
-    for(let d=1;d<=lastDay.getDate();d++){
-      const dayDiv = document.createElement('div');
-      dayDiv.classList.add('day');
-      dayDiv.innerHTML = `<div class="day-label">${d}</div>`;
-      const fullDate = `${d}.${month+1}.${year}`;
-
-      // wydarzenia
-      events.forEach(ev=>{
-        if(ev.date===fullDate){
-          const evtDiv = document.createElement('div');
-          evtDiv.textContent=`${ev.subject}: ${ev.desc}`;
-          evtDiv.classList.add('event-popup');
-          if(ev.type.includes('sprawdzian')) evtDiv.classList.add('event-sprawdzian');
-          else if(ev.type.includes('kartkówka')) evtDiv.classList.add('event-kartkowka');
-          else evtDiv.classList.add('event-inne');
-          dayDiv.appendChild(evtDiv);
-          dayDiv.addEventListener('click', ()=> evtDiv.style.display=evtDiv.style.display==='block'?'none':'block');
-        }
-      });
-
-      // dzisiaj
-      const today = new Date();
-      if(d===today.getDate() && month===today.getMonth() && year===today.getFullYear()){
-        dayDiv.classList.add('today');
-        const todayLabel = document.createElement('div');
-        todayLabel.textContent="DZIŚ";
-        todayLabel.style.fontSize="0.8em";
-        dayDiv.appendChild(todayLabel);
-      }
-
-      container.appendChild(dayDiv);
-    }
+  for(let i=0;i<startOffset;i++){
+    const empty=document.createElement('div'); empty.classList.add('day'); empty.style.background='transparent'; empty.style.border='none'; container.appendChild(empty);
   }
 
-  // inicjalne generowanie
-  window.addEventListener('load', ()=>{
-    generateCalendar(parseInt(monthSelect.value));
-  });
+  for(let d=1;d<=lastDay.getDate();d++){
+    const dayDiv=document.createElement('div'); dayDiv.classList.add('day'); dayDiv.innerHTML=`<div class="day-label">${d}</div>`;
+    const fullDate=`${d}.${month+1}.${year}`;
+    events.forEach(ev=>{
+      if(ev.date===fullDate){
+        const evtDiv=document.createElement('div'); evtDiv.textContent=`${ev.subject}: ${ev.desc}`;
+        evtDiv.classList.add('event-popup');
+        if(ev.type.includes('sprawdzian')) evtDiv.classList.add('event-sprawdzian');
+        else if(ev.type.includes('kartkówka')) evtDiv.classList.add('event-kartkowka');
+        else evtDiv.classList.add('event-inne');
+        dayDiv.appendChild(evtDiv);
+        dayDiv.addEventListener('click', ()=> evtDiv.style.display=evtDiv.style.display==='block'?'none':'block');
+      }
+    });
+    const today=new Date();
+    if(d===today.getDate() && month===today.getMonth() && year===today.getFullYear()){
+      dayDiv.classList.add('today');
+      const todayLabel=document.createElement('div'); todayLabel.textContent="DZIŚ"; todayLabel.style.fontSize="0.8em"; dayDiv.appendChild(todayLabel);
+    }
+    container.appendChild(dayDiv);
+  }
+}
+
+monthSelect.addEventListener('change', ()=> generateCalendar(parseInt(monthSelect.value)));
+window.addEventListener('load', ()=> { 
+  const now=new Date(); 
+  monthSelect.value=now.getMonth()-8>=0?now.getMonth()-8:0;
+  generateCalendar(parseInt(monthSelect.value)); 
+});
 </script>
 
 </body>
