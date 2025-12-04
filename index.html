@@ -26,7 +26,7 @@
   }
 
   section {
-    max-width: 800px;
+    max-width: 900px;
     margin: 20px auto;
     padding: 0 20px;
   }
@@ -118,7 +118,7 @@
     left:50%;
     transform:translateX(-50%);
     width:95%;
-    max-width:900px;
+    max-width:1000px;
     height:80%;
     background:white;
     border:2px solid #4a76a8;
@@ -137,18 +137,24 @@
     cursor:pointer;
   }
 
+  #month-select {
+    margin: 10px 0;
+    padding:5px 10px;
+    font-size:1em;
+  }
+
   #calendar-grid {
     display:grid;
     grid-template-columns: repeat(6, 1fr);
     gap:5px;
-    margin-top:20px;
+    margin-top:10px;
   }
 
   .day {
     border:1px solid #ccc;
     background:#f9f9f9;
     padding:10px;
-    min-height:60px;
+    min-height:70px;
     position:relative;
     border-radius:5px;
     cursor:pointer;
@@ -160,8 +166,15 @@
   }
 
   .day-label {
-    font-size:0.8em;
-    color:#555;
+    font-weight:bold;
+    margin-bottom:5px;
+  }
+
+  .weekdays {
+    display:grid;
+    grid-template-columns: repeat(6, 1fr);
+    font-weight:bold;
+    margin-bottom:5px;
   }
 
   .event-popup {
@@ -197,10 +210,20 @@
 <div id="calendar-modal">
   <button id="close-calendar">✖</button>
   <h2>📅 Terminarz</h2>
+  <select id="month-select"></select>
+  <div class="weekdays">
+    <div>Pon</div>
+    <div>Wt</div>
+    <div>Śr</div>
+    <div>Czw</div>
+    <div>Pt</div>
+    <div>Sob</div>
+  </div>
   <div id="calendar-grid"></div>
 </div>
 
 <section>
+  <!-- Dodaj tutaj wszystkie przedmioty w rozwijanej liście -->
   <!-- Biologia -->
   <div class="subject">
     <div class="subject-header">
@@ -396,6 +419,23 @@
   openBtn.addEventListener('click', ()=> modal.style.display='block');
   closeBtn.addEventListener('click', ()=> modal.style.display='none');
 
+  // Wybór miesiąca
+  const monthSelect = document.getElementById('month-select');
+  const months = [
+    "Wrzesień 2025","Październik 2025","Listopad 2025","Grudzień 2025",
+    "Styczeń 2026","Luty 2026","Marzec 2026","Kwiecień 2026",
+    "Maj 2026","Czerwiec 2026"
+  ];
+  months.forEach((m,i)=> {
+    const opt = document.createElement('option');
+    opt.value=i;
+    opt.textContent=m;
+    monthSelect.appendChild(opt);
+  });
+
+  let currentDate = new Date();
+  monthSelect.value = currentDate.getMonth()-8 >=0 ? currentDate.getMonth()-8 : 0; // ustawia aktualny miesiąc (wrzesień=0)
+
   // Pobieranie wydarzeń z Google Sheets
   const sheetId = "1G57zZRVzq0zuu4wTAXht6DzttC7bgVdJSdd4sdxGx-Q";
   const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
@@ -413,62 +453,71 @@
         const desc = row.c[3]?row.c[3].v:'';
         return {date, subject, type, desc};
       });
-      generateCalendar();
+      generateCalendar(parseInt(monthSelect.value));
     })
     .catch(err=>console.log(err));
 
-  function generateCalendar() {
+  monthSelect.addEventListener('change', ()=>{
+    generateCalendar(parseInt(monthSelect.value));
+  });
+
+  function generateCalendar(monthIndex){
     const container = document.getElementById('calendar-grid');
     container.innerHTML = '';
-    const now = new Date();
-    const todayStr = `${now.getDate()}.${now.getMonth()+1}.${now.getFullYear()}`;
+    const year = monthIndex+8>=12 ? 2026 : 2025; // prosty mapping do roku
+    const month = monthIndex+8>=12 ? monthIndex-4 : monthIndex+8; // mapping miesiąca w Date
+    const firstDay = new Date(year, month,1);
+    const lastDay = new Date(year, month+1,0);
 
-    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
-    const lastDay = new Date(now.getFullYear(), now.getMonth()+1, 0);
+    // ile pustych dni przed 1. dniem miesiąca (poniedziałek=0)
+    let startOffset = firstDay.getDay()-1;
+    if(startOffset<0) startOffset=5; // sobota poprzedniego miesiąca
+    for(let i=0;i<startOffset;i++){
+      const empty = document.createElement('div');
+      empty.classList.add('day');
+      empty.style.background='transparent';
+      empty.style.border='none';
+      container.appendChild(empty);
+    }
 
-    let dayCounter = 1;
-    const totalCells = Math.ceil((lastDay.getDate() + firstDay.getDay() - 1)/6)*6;
-
-    for(let i=0; i<totalCells; i++){
+    for(let d=1;d<=lastDay.getDate();d++){
       const dayDiv = document.createElement('div');
       dayDiv.classList.add('day');
-      if(dayCounter<=lastDay.getDate()){
-        dayDiv.innerHTML = `<div class="day-label">${dayCounter}</div>`;
-        const fullDate = `${dayCounter}.${now.getMonth()+1}.${now.getFullYear()}`;
+      dayDiv.innerHTML = `<div class="day-label">${d}</div>`;
+      const fullDate = `${d}.${month+1}.${year}`;
 
-        // wydarzenia
-        events.forEach(ev=>{
-          if(ev.date === fullDate){
-            const evtDiv = document.createElement('div');
-            evtDiv.textContent = `${ev.subject}: ${ev.desc}`;
-            evtDiv.classList.add('event-popup');
-            if(ev.type.includes('sprawdzian')) evtDiv.classList.add('event-sprawdzian');
-            else if(ev.type.includes('kartkówka')) evtDiv.classList.add('event-kartkowka');
-            else evtDiv.classList.add('event-inne');
-            dayDiv.appendChild(evtDiv);
-
-            dayDiv.addEventListener('click', ()=> {
-              evtDiv.style.display = evtDiv.style.display==='block'?'none':'block';
-            });
-          }
-        });
-
-        if(fullDate===todayStr) {
-          dayDiv.classList.add('today');
-          const todayLabel = document.createElement('div');
-          todayLabel.textContent = "DZIŚ";
-          todayLabel.style.fontSize="0.8em";
-          dayDiv.appendChild(todayLabel);
+      // wydarzenia
+      events.forEach(ev=>{
+        if(ev.date===fullDate){
+          const evtDiv = document.createElement('div');
+          evtDiv.textContent=`${ev.subject}: ${ev.desc}`;
+          evtDiv.classList.add('event-popup');
+          if(ev.type.includes('sprawdzian')) evtDiv.classList.add('event-sprawdzian');
+          else if(ev.type.includes('kartkówka')) evtDiv.classList.add('event-kartkowka');
+          else evtDiv.classList.add('event-inne');
+          dayDiv.appendChild(evtDiv);
+          dayDiv.addEventListener('click', ()=> evtDiv.style.display=evtDiv.style.display==='block'?'none':'block');
         }
+      });
 
-        dayCounter++;
-      } else {
-        dayDiv.style.background='transparent';
-        dayDiv.style.border='none';
+      // dzisiaj
+      const today = new Date();
+      if(d===today.getDate() && month===today.getMonth() && year===today.getFullYear()){
+        dayDiv.classList.add('today');
+        const todayLabel = document.createElement('div');
+        todayLabel.textContent="DZIŚ";
+        todayLabel.style.fontSize="0.8em";
+        dayDiv.appendChild(todayLabel);
       }
+
       container.appendChild(dayDiv);
     }
   }
+
+  // inicjalne generowanie
+  window.addEventListener('load', ()=>{
+    generateCalendar(parseInt(monthSelect.value));
+  });
 </script>
 
 </body>
