@@ -21,7 +21,9 @@
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
   }
 
-  header h1 { margin: 0; }
+  header h1 {
+    margin: 0;
+  }
 
   section {
     max-width: 800px;
@@ -48,9 +50,13 @@
     font-size: 1.1em;
   }
 
-  .subject-header:hover { background: #c0d7ed; }
+  .subject-header:hover {
+    background: #c0d7ed;
+  }
 
-  .arrow { transition: 0.3s; }
+  .arrow {
+    transition: 0.3s;
+  }
 
   .subject-content {
     max-height: 0;
@@ -71,14 +77,24 @@
     transition: 0.2s;
   }
 
-  .subject-content li:hover { background: #e0ebf5; }
+  .subject-content li:hover {
+    background: #e0ebf5;
+  }
 
-  a { text-decoration: none; color: #4a76a8; font-weight: bold; }
+  a {
+    text-decoration: none;
+    color: #4a76a8;
+    font-weight: bold;
+  }
 
-  .expanded .arrow { transform: rotate(90deg); }
+  .expanded .arrow {
+    transform: rotate(90deg);
+  }
 
   @media (max-width: 600px) {
-    .subject-header { font-size: 1em; }
+    .subject-header {
+      font-size: 1em;
+    }
   }
 
   /* TERMINARZ */
@@ -98,18 +114,34 @@
   #calendar-modal {
     display:none;
     position:fixed;
-    top:50px; left:50%; transform:translateX(-50%);
-    width:90%; max-width:600px; height:80%;
-    background:white; border:2px solid #4a76a8; border-radius:10px;
-    overflow:auto; padding:20px; box-shadow:0 4px 10px rgba(0,0,0,0.3);
+    top:50px;
+    left:50%;
+    transform:translateX(-50%);
+    width:90%;
+    max-width:600px;
+    height:80%;
+    background:white;
+    border:2px solid #4a76a8;
+    border-radius:10px;
+    overflow:auto;
+    padding:20px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.3);
     z-index:1000;
   }
 
   #calendar-modal button#close-calendar {
-    float:right; background:none; border:none; font-size:18px; cursor:pointer;
+    float:right;
+    background:none;
+    border:none;
+    font-size:18px;
+    cursor:pointer;
   }
 
-  .event { padding:5px 8px; border-radius:4px; margin:3px 0; }
+  .event {
+    padding:5px 8px;
+    border-radius:4px;
+    margin:3px 0;
+  }
 
   .sprawdzian { background:#ff4c4c; color:white; }
   .kartkowka { background:#ffcc00; color:black; }
@@ -134,8 +166,174 @@
 </div>
 
 <section>
-  <!-- PRZEDMIOTY (Twój aktualny kod) -->
-  <!-- Wklej tu wszystkie divy .subject jak w Twoim HTML, np. Biologia, Geografia, Matematyka itd. -->
+  <!-- Biologia -->
+  <div class="subject">
+    <div class="subject-header">
+      Biologia <span class="arrow">▶</span>
+    </div>
+    <div class="subject-content">
+      <ul>
+        <li><a href="biologia/Aminokwasy.pdf" target="_blank">Aminokwasy</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Geografia -->
+  <div class="subject">
+    <div class="subject-header">
+      Geografia <span class="arrow">▶</span>
+    </div>
+    <div class="subject-content">
+      <ul>
+        <li><a href="geografia/placeholder.txt" target="_blank">placeholder.txt</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Matematyka -->
+  <div class="subject">
+    <div class="subject-header">
+      Matematyka <span class="arrow">▶</span>
+    </div>
+    <div class="subject-content">
+      <ul>
+        <li><a href="matematyka/placeholder.txt" target="_blank">placeholder.txt</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Polski -->
+  <div class="subject">
+    <div class="subject-header">
+      Polski <span class="arrow">▶</span>
+    </div>
+    <div class="subject-content">
+      <ul>
+        <li><a href="polski/placeholder.txt" target="_blank">placeholder.txt</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Historia -->
+  <div class="subject">
+    <div class="subject-header">
+      Historia <span class="arrow">▶</span>
+    </div>
+    <div class="subject-content">
+      <ul>
+        <li><a href="historia/placeholder.txt" target="_blank">placeholder.txt</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Biznes i zarządzanie -->
+  <div class="subject">
+    <div class="subject-header">
+      Biznes i zarządzanie <span class="arrow">▶</span>
+    </div>
+    <div class="subject-content">
+      <ul>
+        <li><a href="biznes_i_zarzadzanie/placeholder.txt" target="_blank">placeholder.txt</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Chemia -->
+  <div class="subject">
+    <div class="subject-header">
+      Chemia <span class="arrow">▶</span>
+    </div>
+    <div class="subject-content">
+      <ul>
+        <li><a href="chemia/placeholder.txt" target="_blank">placeholder.txt</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- EDB -->
+  <div class="subject">
+    <div class="subject-header">
+      EDB <span class="arrow">▶</span>
+    </div>
+    <div class="subject-content">
+      <ul>
+        <li><a href="edb/placeholder.txt" target="_blank">placeholder.txt</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Fizyka -->
+  <div class="subject">
+    <div class="subject-header">
+      Fizyka <span class="arrow">▶</span>
+    </div>
+    <div class="subject-content">
+      <ul>
+        <li><a href="fizyka/placeholder.txt" target="_blank">placeholder.txt</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Informatyka -->
+  <div class="subject">
+    <div class="subject-header">
+      Informatyka <span class="arrow">▶</span>
+    </div>
+    <div class="subject-content">
+      <ul>
+        <li><a href="informatyka/placeholder.txt" target="_blank">placeholder.txt</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Język angielski -->
+  <div class="subject">
+    <div class="subject-header">
+      Język angielski <span class="arrow">▶</span>
+    </div>
+    <div class="subject-content">
+      <ul>
+        <li><a href="angielski/placeholder.txt" target="_blank">placeholder.txt</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Język hiszpański -->
+  <div class="subject">
+    <div class="subject-header">
+      Język hiszpański <span class="arrow">▶</span>
+    </div>
+    <div class="subject-content">
+      <ul>
+        <li><a href="hiszpanski/placeholder.txt" target="_blank">placeholder.txt</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Muzyka -->
+  <div class="subject">
+    <div class="subject-header">
+      Muzyka <span class="arrow">▶</span>
+    </div>
+    <div class="subject-content">
+      <ul>
+        <li><a href="muzyka/placeholder.txt" target="_blank">placeholder.txt</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- INNE -->
+  <div class="subject">
+    <div class="subject-header">
+      INNE <span class="arrow">▶</span>
+    </div>
+    <div class="subject-content">
+      <ul>
+        <li><a href="inne/placeholder.txt" target="_blank">placeholder.txt</a></li>
+      </ul>
+    </div>
+  </div>
+
 </section>
 
 <script>
