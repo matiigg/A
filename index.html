@@ -6,50 +6,96 @@
 <title>📚 Notatki szkolne</title>
 <style>
   body {
-    font-family: Arial, sans-serif;
+    font-family: 'Arial', sans-serif;
     background: #f4f4f9;
-    color: #333;
     margin: 0;
     padding: 0;
+    color: #333;
   }
+
   header {
     background: #4a76a8;
     color: white;
-    padding: 20px 0;
     text-align: center;
+    padding: 20px 0;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
   }
-  h1 {
+
+  header h1 {
     margin: 0;
   }
+
   section {
-    padding: 20px;
     max-width: 800px;
-    margin: auto;
+    margin: 20px auto;
+    padding: 0 20px;
   }
-  h2 {
+
+  .subject {
     background: #d3e0f0;
-    padding: 10px;
+    margin: 10px 0;
     border-left: 5px solid #4a76a8;
+    border-radius: 5px;
+    overflow: hidden;
+    transition: 0.3s;
+    cursor: pointer;
   }
-  ul {
+
+  .subject-header {
+    padding: 12px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    font-size: 1.1em;
+  }
+
+  .subject-header:hover {
+    background: #c0d7ed;
+  }
+
+  .arrow {
+    transition: 0.3s;
+  }
+
+  .subject-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    background: white;
+  }
+
+  .subject-content ul {
     list-style: none;
     padding-left: 0;
+    margin: 0;
   }
-  li {
-    background: white;
-    margin: 5px 0;
-    padding: 10px;
-    border-radius: 5px;
+
+  .subject-content li {
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
     transition: 0.2s;
   }
-  li:hover {
+
+  .subject-content li:hover {
     background: #e0ebf5;
   }
+
   a {
     text-decoration: none;
     color: #4a76a8;
     font-weight: bold;
+  }
+
+  /* Strzałka obrócona w dół po rozwinięciu */
+  .expanded .arrow {
+    transform: rotate(90deg);
+  }
+
+  @media (max-width: 600px) {
+    .subject-header {
+      font-size: 1em;
+    }
   }
 </style>
 </head>
@@ -57,35 +103,79 @@
 
 <header>
   <h1>📚 Notatki szkolne</h1>
-  <p>Kliknij na plik, aby pobrać</p>
+  <p>Kliknij przedmiot, aby zobaczyć pliki</p>
 </header>
 
 <section>
-  <h2>Matematyka</h2>
-  <ul>
-    <li><a href="matematyka/notatka1.pdf" target="_blank">notatka1.pdf</a></li>
-    <li><a href="matematyka/notatka2.pdf" target="_blank">notatka2.pdf</a></li>
-    <!-- Dodaj kolejne pliki matematyka tutaj -->
-  </ul>
+  <div class="subject">
+    <div class="subject-header">
+      Matematyka <span class="arrow">▶</span>
+    </div>
+    <div class="subject-content">
+      <ul>
+        <li><a href="matematyka/notatka1.pdf" target="_blank">notatka1.pdf</a></li>
+        <li><a href="matematyka/notatka2.pdf" target="_blank">notatka2.pdf</a></li>
+        <!-- Dodaj kolejne pliki matematyka tutaj -->
+      </ul>
+    </div>
+  </div>
 
-  <h2>Polski</h2>
-  <ul>
-    <li><a href="polski/notatka1.odt" target="_blank">notatka1.pdf</a></li>
-    <!-- Dodaj kolejne pliki polski tutaj -->
-  </ul>
+  <div class="subject">
+    <div class="subject-header">
+      Polski <span class="arrow">▶</span>
+    </div>
+    <div class="subject-content">
+      <ul>
+        <li><a href="polski/notatka1.odt" target="_blank">notatka1.odt</a></li>
+        <!-- Dodaj kolejne pliki polski tutaj -->
+      </ul>
+    </div>
+  </div>
 
-  <h2>Historia</h2>
-  <ul>
-    <li><a href="historia/Historia_jako_nauka.pdf" target="_blank">Historia jako nauka</a></li>
-    <!-- Dodaj kolejne pliki historia tutaj -->
-  </ul>
+  <div class="subject">
+    <div class="subject-header">
+      Historia <span class="arrow">▶</span>
+    </div>
+    <div class="subject-content">
+      <ul>
+        <li><a href="historia/Historia_jako_nauka.pdf" target="_blank">Historia jako nauka</a></li>
+        <!-- Dodaj kolejne pliki historia tutaj -->
+      </ul>
+    </div>
+  </div>
 
-  <h2>Biologia</h2>
-  <ul>
-    <li><a href="biologia/notatka1.pdf" target="_blank">notatka1.pdf</a></li>
-    <!-- Dodaj kolejne pliki biologia tutaj -->
-  </ul>
+  <div class="subject">
+    <div class="subject-header">
+      Biologia <span class="arrow">▶</span>
+    </div>
+    <div class="subject-content">
+      <ul>
+        <li><a href="biologia/notatka1.pdf" target="_blank">notatka1.pdf</a></li>
+        <!-- Dodaj kolejne pliki biologia tutaj -->
+      </ul>
+    </div>
+  </div>
+
 </section>
+
+<script>
+  // Skrypt do rozwijania list
+  const subjects = document.querySelectorAll('.subject');
+  subjects.forEach(subject => {
+    const header = subject.querySelector('.subject-header');
+    const content = subject.querySelector('.subject-content');
+    header.addEventListener('click', () => {
+      const isExpanded = subject.classList.contains('expanded');
+      if (isExpanded) {
+        content.style.maxHeight = null;
+        subject.classList.remove('expanded');
+      } else {
+        content.style.maxHeight = content.scrollHeight + "px";
+        subject.classList.add('expanded');
+      }
+    });
+  });
+</script>
 
 </body>
 </html>
