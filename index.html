@@ -117,8 +117,8 @@
     top:50px;
     left:50%;
     transform:translateX(-50%);
-    width:90%;
-    max-width:600px;
+    width:95%;
+    max-width:900px;
     height:80%;
     background:white;
     border:2px solid #4a76a8;
@@ -137,17 +137,52 @@
     cursor:pointer;
   }
 
-  .event {
-    padding:5px 8px;
-    border-radius:4px;
-    margin:3px 0;
+  #calendar-grid {
+    display:grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap:5px;
+    margin-top:20px;
   }
 
-  .sprawdzian { background:#ff4c4c; color:white; }
-  .kartkowka { background:#ffcc00; color:black; }
-  .inne { background:#4a76a8; color:white; }
+  .day {
+    border:1px solid #ccc;
+    background:#f9f9f9;
+    padding:10px;
+    min-height:60px;
+    position:relative;
+    border-radius:5px;
+    cursor:pointer;
+  }
 
-  .today { border:2px solid #4caf50; padding:5px 8px; border-radius:4px; }
+  .day.today {
+    background:#ffcccc;
+    font-weight:bold;
+  }
+
+  .day-label {
+    font-size:0.8em;
+    color:#555;
+  }
+
+  .event-popup {
+    display:none;
+    position:absolute;
+    top:10px;
+    left:50%;
+    transform:translateX(-50%);
+    background:white;
+    border:1px solid #4a76a8;
+    border-radius:5px;
+    padding:5px 10px;
+    z-index:1000;
+    box-shadow:0 2px 5px rgba(0,0,0,0.2);
+    width:150px;
+    font-size:0.9em;
+  }
+
+  .event-sprawdzian {background:#ff4c4c; color:white;}
+  .event-kartkowka {background:#ffcc00; color:black;}
+  .event-inne {background:#4a76a8; color:white;}
 </style>
 </head>
 <body>
@@ -162,7 +197,7 @@
 <div id="calendar-modal">
   <button id="close-calendar">✖</button>
   <h2>📅 Terminarz</h2>
-  <div id="calendar-content">Ładowanie...</div>
+  <div id="calendar-grid"></div>
 </div>
 
 <section>
@@ -358,7 +393,6 @@
   const openBtn = document.getElementById('open-calendar');
   const closeBtn = document.getElementById('close-calendar');
   const modal = document.getElementById('calendar-modal');
-
   openBtn.addEventListener('click', ()=> modal.style.display='block');
   closeBtn.addEventListener('click', ()=> modal.style.display='none');
 
@@ -366,35 +400,75 @@
   const sheetId = "1G57zZRVzq0zuu4wTAXht6DzttC7bgVdJSdd4sdxGx-Q";
   const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
 
+  let events = [];
+
   fetch(url)
     .then(res => res.text())
     .then(data => {
       const jsonData = JSON.parse(data.substr(47).slice(0, -2));
-      const rows = jsonData.table.rows;
-      const container = document.getElementById("calendar-content");
-      container.innerHTML = '';
-      const today = new Date().toISOString().split('T')[0];
-
-      rows.forEach(row => {
-        const date = row.c[0] ? row.c[0].v : '';
-        const subject = row.c[1] ? row.c[1].v : '';
-        const type = row.c[2] ? row.c[2].v.toLowerCase() : '';
-        const desc = row.c[3] ? row.c[3].v : '';
-
-        const div = document.createElement('div');
-        div.textContent = `${date} | ${subject} | ${type} | ${desc}`;
-        div.classList.add('event');
-
-        if(type.includes('sprawdzian')) div.classList.add('sprawdzian');
-        else if(type.includes('kartkówka')) div.classList.add('kartkowka');
-        else div.classList.add('inne');
-
-        if(date === today) div.classList.add('today');
-
-        container.appendChild(div);
+      events = jsonData.table.rows.map(row=>{
+        const date = row.c[0]?row.c[0].v:'';
+        const subject = row.c[1]?row.c[1].v:'';
+        const type = row.c[2]?row.c[2].v.toLowerCase():'inne';
+        const desc = row.c[3]?row.c[3].v:'';
+        return {date, subject, type, desc};
       });
+      generateCalendar();
     })
-    .catch(err => console.log(err));
+    .catch(err=>console.log(err));
+
+  function generateCalendar() {
+    const container = document.getElementById('calendar-grid');
+    container.innerHTML = '';
+    const now = new Date();
+    const todayStr = `${now.getDate()}.${now.getMonth()+1}.${now.getFullYear()}`;
+
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastDay = new Date(now.getFullYear(), now.getMonth()+1, 0);
+
+    let dayCounter = 1;
+    const totalCells = Math.ceil((lastDay.getDate() + firstDay.getDay() - 1)/6)*6;
+
+    for(let i=0; i<totalCells; i++){
+      const dayDiv = document.createElement('div');
+      dayDiv.classList.add('day');
+      if(dayCounter<=lastDay.getDate()){
+        dayDiv.innerHTML = `<div class="day-label">${dayCounter}</div>`;
+        const fullDate = `${dayCounter}.${now.getMonth()+1}.${now.getFullYear()}`;
+
+        // wydarzenia
+        events.forEach(ev=>{
+          if(ev.date === fullDate){
+            const evtDiv = document.createElement('div');
+            evtDiv.textContent = `${ev.subject}: ${ev.desc}`;
+            evtDiv.classList.add('event-popup');
+            if(ev.type.includes('sprawdzian')) evtDiv.classList.add('event-sprawdzian');
+            else if(ev.type.includes('kartkówka')) evtDiv.classList.add('event-kartkowka');
+            else evtDiv.classList.add('event-inne');
+            dayDiv.appendChild(evtDiv);
+
+            dayDiv.addEventListener('click', ()=> {
+              evtDiv.style.display = evtDiv.style.display==='block'?'none':'block';
+            });
+          }
+        });
+
+        if(fullDate===todayStr) {
+          dayDiv.classList.add('today');
+          const todayLabel = document.createElement('div');
+          todayLabel.textContent = "DZIŚ";
+          todayLabel.style.fontSize="0.8em";
+          dayDiv.appendChild(todayLabel);
+        }
+
+        dayCounter++;
+      } else {
+        dayDiv.style.background='transparent';
+        dayDiv.style.border='none';
+      }
+      container.appendChild(dayDiv);
+    }
+  }
 </script>
 
 </body>
